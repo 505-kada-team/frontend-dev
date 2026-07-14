@@ -1,31 +1,10 @@
 import { useState, useEffect } from "react";
 import { Sun, Moon, LogOut } from "lucide-react";
+import { useTheme } from "../context/ThemeContext";
+
 
 export default function SettingsPage() {
-  const [dark, setDark] = useState(false);
-
-  useEffect(() => {
-    const isDark = localStorage.getItem("theme") === "dark";
-
-    if (isDark) {
-      document.documentElement.classList.add("dark");
-      setDark(true);
-    }
-  }, []);
-
-  const toggleTheme = () => {
-    const newTheme = !dark;
-
-    setDark(newTheme);
-
-    if (newTheme) {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
-  };
+  const { dark, toggleTheme } = useTheme();
 
   const user = {
     name: "Admin",
