@@ -9,7 +9,7 @@ import {
   Sun,
   Moon,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useTheme } from "../context/ThemeContext";
 
 const navItems = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -20,30 +20,7 @@ const navItems = [
 ];
 
 export default function MainLayout() {
-  const [dark, setDark] = useState(false);
-
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
-
-    if (savedTheme === "dark") {
-      document.documentElement.classList.add("dark");
-      setDark(true);
-    }
-  }, []);
-
-  const toggleTheme = () => {
-    const next = !dark;
-
-    setDark(next);
-
-    if (next) {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
-  };
+  const { dark, toggleTheme } = useTheme();
 
   return (
     <div className="flex min-h-screen bg-background text-foreground transition-colors">
