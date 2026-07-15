@@ -13,6 +13,7 @@ import {
   Moon,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { useTheme } from "../context/ThemeContext";
 
 const navItems = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -23,49 +24,8 @@ const navItems = [
 ];
 
 export default function MainLayout() {
-  const [dark, setDark] = useState(false);
-  const { user, isLoading, logout } = useAuth();
-
-    useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
-
-    if (savedTheme === "dark") {
-      document.documentElement.classList.add("dark");
-      setDark(true);
-    }
-  }, []);
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    );
-  }
-
-  //pengecekan oleh authcontext kalau tidak user di tendang ke login
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
-
-  const handleLogout = async () => {
-    await logout();
-    toast.success("Logged out successfully");
-  };
-
-  const toggleTheme = () => {
-    const next = !dark;
-
-    setDark(next);
-
-    if (next) {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
-  };
+const { dark, toggleTheme } = useTheme();
+const { user, isLoading, logout } = useAuth();
 
   // Ekstrak nama dan inisial secara dinamis (fallback ke 'User' jika data belum load)
   const userName = user?.name || "User";
