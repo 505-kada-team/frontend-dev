@@ -1,60 +1,98 @@
-// Mock Inventory Storage in memory
-let mockInventories = [
-  { id: 1, name: "Tapioca Pearls", quantity: 15, unit: "kg", price: 40000, minStock: 5, description: "a product" },
-  { id: 2, name: "Matcha Powder", quantity: 3, unit: "kg", price: 180000, minStock: 2, description: "a product" },
-  { id: 3, name: "Almond Milk", quantity: 2, unit: "L", price: 35000, minStock: 5, description: "a product" },
-  { id: 4, name: "Hazelnut Syrup", quantity: 1, unit: "btl", price: 120000, minStock: 4, description: "a product" },
-  { id: 5, name: "Espresso Beans", quantity: 25, unit: "kg", price: 150000, minStock: 10, description: "a product" },
-  { id: 6, name: "Brown Sugar Syrup", quantity: 8, unit: "btl", price: 65000, minStock: 3, description: "a product" },
-]
+import api from "../lib/api";
 
+// 1. Mengambil semua data
 export const getInventories = async () => {
-  // Simulate delay
-  await new Promise((resolve) => setTimeout(resolve, 500))
-  return [...mockInventories]
-}
+  try {
+    const response = await api.get("/inventory");
+    
+    // Tarik data langsung ke array yang bersembunyi di lapis ketiga
+    // Gunakan optional chaining (?.) agar aman jika datanya kosong/null
+    const rawData = response.data?.data?.data || [];
 
+    // Terjemahkan data untuk UI
+    return rawData.map(item => ({
+      ...item,
+      id: item._id,                
+      name: item.ingredientName,   
+      price: item.unitCost,        
+      minStock: item.minStock || 0 
+    }));
+  } catch (error) {
+    console.error("Detail Error:", error);
+    throw new Error(error.response?.data?.message || "Gagal mengambil data inventori");
+  }
+};
+
+// 2. Mengambil data spesifik berdasarkan ID
 export const getInventoryById = async (id) => {
-  await new Promise((resolve) => setTimeout(resolve, 300))
-  return mockInventories.find((item) => item.id === Number(id))
-}
+  try {
+    const response = await api.get(`/inventory/${id}`);
+    const item = response.data.data || response.data;
+    
+    // Terjemahkan juga saat mengambil 1 data
+    return {
+      ...item,
+      id: item._id,
+      name: item.ingredientName,
+      price: item.unitCost,
+      minStock: item.minStock || 0
+    };
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Gagal mengambil detail data");
+  }
+};
 
+// 3. Menambahkan data baru
 export const createInventory = async (data) => {
-  await new Promise((resolve) => setTimeout(resolve, 600))
-  const newId = mockInventories.length > 0 ? Math.max(...mockInventories.map((i) => i.id)) + 1 : 1
-  const newItem = {
-    id: newId,
-    name: data.name,
-    quantity: Number(data.quantity),
-    unit: data.unit,
-    price: Number(data.price),
-    minStock: Number(data.minStock || 0),
-    description: data.description
-  }
-  mockInventories.unshift(newItem)
-  return newItem
-}
-
-export const deleteInventory = async (id) => {
-  await new Promise((resolve) => setTimeout(resolve, 500))
-  mockInventories = mockInventories.filter((item) => item.id !== Number(id))
-  return { success: true }
-}
-
-export const updateInventory = async (id, data) => {
-  await new Promise((resolve) => setTimeout(resolve, 500))
-  const idx = mockInventories.findIndex((item) => item.id === Number(id))
-  if (idx !== -1) {
-    mockInventories[idx] = {
-      ...mockInventories[idx],
-      name: data.name,
-      quantity: Number(data.quantity),
+  try {
+    const payload = {
+      ingredientName: data.ingredientName,
+      description: data.description,
       unit: data.unit,
-      price: Number(data.price),
-      minStock: Number(data.minStock || 0),
-      description: data.description
-    }
-    return mockInventories[idx]
+      quantity: Number(data.quantity),
+      unitCost: Number(data.unitCost),
+      validFrom: data.validFrom,
+      validTo: data.validTo,
+    };
+
+    console.log("Payload:", payload);
+
+    const response = await api.post("/inventory", payload);
+
+    return response.data;
+  } catch (error) {
+    console.error(error.response?.data);
+    throw new Error(error.response?.data?.message || "Gagal menambahkan data");
   }
-  throw new Error("Item not found")
-}
+};
+
+// 4. Mengubah data (Edit)
+export const updateInventory = async (id, data) => {
+  try {
+    const payload = {
+      ingredientName: data.ingredientName,
+      description: data.description,
+      unit: data.unit,
+      quantity: Number(data.quantity),
+      unitCost: Number(data.unitCost),
+      validFrom: data.validFrom,
+      validTo: data.validTo,
+    };
+
+    const response = await api.patch(`/inventory/${id}`, payload);
+
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Gagal mengubah data");
+  }
+};
+
+// 5. Menghapus data
+export const deleteInventory = async (id) => {
+  try {
+    const response = await api.delete(`/inventory/${id}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Gagal menghapus data");
+  }
+};

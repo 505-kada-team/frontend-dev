@@ -10,6 +10,10 @@ import InventoryPage from "@/pages/InventoryPage"
 import RecipePage from "@/pages/RecipePage"
 import SellingPlanPage from "@/pages/SellingPlanPage"
 import SettingsPage from "@/pages/SettingsPage"
+import VerifyEmailPage from "@/pages/VerifyEmail"
+import ForgotPassword from "@/pages/ForgorPassword"
+import VerifyResetCodePage from "@/pages/VerifyResetCode"
+import ResetPassword from "@/pages/ResetPassword"
 
 export default function AppRoutes() {
   return (
@@ -21,6 +25,10 @@ export default function AppRoutes() {
       <Route element={<AuthLayout />}>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path= "/verify-email" element={<VerifyEmailPage />} />
+        <Route path="/forgot-password" element={<ForgotPassword/>}/>
+        <Route path="verify-reset-code" element={<VerifyResetCodePage/>}/>
+        <Route path="/reset-password" element={<ResetPassword/>}/>
       </Route>
 
       {/* grup halaman privat */}
