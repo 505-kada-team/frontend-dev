@@ -27,9 +27,26 @@ export default function MainLayout() {
 const { dark, toggleTheme } = useTheme();
 const { user, isLoading, logout } = useAuth();
 
-  // Ekstrak nama dan inisial secara dinamis (fallback ke 'User' jika data belum load)
-  const userName = user?.name || "User";
-  const userInitial = userName.charAt(0).toUpperCase();
+if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  const handleLogout = async () => {
+    await logout();
+    toast.success('Logged out successfully');
+  };
+
+// Ekstrak nama dan inisial secara dinamis (fallback ke 'User' jika data belum load)
+const userName = user?.name || "User";
+const userInitial = userName.charAt(0).toUpperCase();
 
   return (
     <div className="flex min-h-screen bg-background text-foreground transition-colors">
