@@ -12,10 +12,8 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@
 import { createInventory, updateInventory } from '@/services/inventoryService';
 import { UNIT_OPTIONS } from "@/lib/constants"
 
-// Class buat hilangin spinner angka + cegah browser render panah
 const noSpinnerClass = '[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none';
 
-// Cegah user ngetik karakter yang bikin angka jadi invalid (minus, plus, notasi e)
 const blockInvalidNumberKeys = (e) => {
   if (['-', '+', 'e', 'E'].includes(e.key)) e.preventDefault();
 };
@@ -35,12 +33,6 @@ const inventorySchema = z.object({
     .refine((val) => !isNaN(Number(val)) && Number(val) >= 0, {
       message: 'Price must be a positive number',
     }),
-  minStock: z
-    .string()
-    .min(1, 'Minimum stock threshold is required')
-    .refine((val) => !isNaN(Number(val)) && Number(val) >= 0, {
-      message: 'Minimum stock must be a positive number',
-    }),
   description: z.string(),
 });
 
@@ -58,11 +50,9 @@ export default function InventoryForm({ initialData, onSubmitSuccess, onCancel }
     resolver: zodResolver(inventorySchema),
     defaultValues: {
       name: initialData?.name || '',
-      // kosong, bukan "0" — biar tidak ketiban angka nol saat mulai ngetik
       quantity: initialData?.quantity?.toString() || '',
       unit: initialData?.unit || '',
       price: initialData?.price?.toString() || '',
-      minStock: initialData?.minStock?.toString() || '',
       description: initialData?.description || '',
     },
   });
@@ -144,12 +134,6 @@ export default function InventoryForm({ initialData, onSubmitSuccess, onCancel }
           <Label htmlFor="price">Price (Rp) per Unit</Label>
           <Input id="price" type="number" min={0} placeholder="e.g. 50000" className={noSpinnerClass} onKeyDown={blockInvalidNumberKeys} onWheel={(e) => e.target.blur()} {...formRegister('price')} aria-invalid={!!errors.price} />
           {errors.price && <p className="text-xs text-destructive mt-1">{errors.price.message}</p>}
-        </div>
-
-        <div className="space-y-1">
-          <Label htmlFor="minStock">Min Stock Alert</Label>
-          <Input id="minStock" type="number" min={0} placeholder="e.g. 3" className={noSpinnerClass} onKeyDown={blockInvalidNumberKeys} onWheel={(e) => e.target.blur()} {...formRegister('minStock')} aria-invalid={!!errors.minStock} />
-          {errors.minStock && <p className="text-xs text-destructive mt-1">{errors.minStock.message}</p>}
         </div>
       </div>
 

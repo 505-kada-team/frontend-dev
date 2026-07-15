@@ -92,8 +92,12 @@ export default function RecipePage() {
   };
 
   const handleSave = (data) => {
-    console.log('Recipe data:', data);
     // nanti: createRecipe(data) / updateRecipe(editingItem.id, data)
+    if (editingItem) {
+      setRecipes((prev) => prev.map((r) => (r.id === editingItem.id ? { ...r, ...data } : r)));
+    } else {
+      setRecipes((prev) => [...prev, { ...data, id: Date.now() }]);
+    }
     setIsFormOpen(false);
   };
 
