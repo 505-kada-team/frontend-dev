@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
-// import Pagination from "@/components/shared/Pagination"
+import Pagination from "@/components/shared/Pagination"
 
 const ITEMS_PER_PAGE = 10
 
@@ -131,12 +131,12 @@ export default function SellingPlanPage() {
         </table>
       </div>
 
-      {/* <Pagination
+      <Pagination
         currentPage={currentPage}
         totalItems={dummyPlans.length}
         itemsPerPage={ITEMS_PER_PAGE}
         onPageChange={setCurrentPage}
-      /> */}
+      />
     </div>
   )
 }
