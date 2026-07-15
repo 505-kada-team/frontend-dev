@@ -15,7 +15,6 @@ export default function InventoryPage() {
   const { inventories, loading, error, refetch } = useInventories();
   const [searchTerm, setSearchTerm] = useState('');
   const [isPlanningOpen, setIsPlanningOpen] = useState(false);
-  
 
   // Dialog State
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -50,7 +49,7 @@ export default function InventoryPage() {
   // Filtered Inventories logic
   const filteredInventories = inventories.filter((item) => {
     const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase());
-  
+
     return matchesSearch;
   });
 
@@ -135,11 +134,14 @@ export default function InventoryPage() {
             <Button onClick={handleOpenAdd} className="mt-4 bg-orange-500 text-white rounded-full cursor-pointer hover:bg-orange-600">
               Add New Item
             </Button>
+            <Button onClick={() => setIsPlanningOpen(true)} variant="outline" className="bg-orange-500 hover:bg-orange-600 hover:text-white text-white rounded-full flex items-center gap-1.5 px-4 h-9 cursor-pointer transition-colors">
+              <ClipboardList className="size-4" />
+              Simulasi Produksi
+            </Button>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredInventories.map((item) => {
-
               return (
                 <Card key={item.id} className="bg-white border border-slate-200 hover:border-slate-300 hover:shadow-md transition-all rounded-3xl flex flex-col justify-between">
                   <CardContent className="p-5 flex flex-col h-full justify-between gap-4">
