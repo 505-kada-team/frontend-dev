@@ -3,7 +3,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import Pagination from "@/components/shared/Pagination"
 
-const ITEMS_PER_PAGE = 10
+const ITEMS_PER_PAGE = 5
 
 // Dummy data — nanti diganti data resep asli (dari RecipePage/backend).
 // `isAvailable` sementara statis untuk slicing tampilan; nanti dihitung
