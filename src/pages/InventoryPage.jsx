@@ -114,7 +114,7 @@ export default function InventoryPage() {
           </div>
 
           {/* Low Stock Checkbox Toggle */}
-          <label className="flex items-center gap-2 px-3 py-2 border rounded-3xl border-slate-200 bg-slate-50 hover:bg-slate-100 cursor-pointer transition-colors select-none text-sm text-slate-700">
+          {/* <label className="flex items-center gap-2 px-3 py-2 border rounded-3xl border-slate-200 bg-slate-50 hover:bg-slate-100 cursor-pointer transition-colors select-none text-sm text-slate-700">
             <input
               type="checkbox"
               className="accent-orange-500 size-4 cursor-pointer"
@@ -122,7 +122,7 @@ export default function InventoryPage() {
               onChange={(e) => setShowLowStockOnly(e.target.checked)}
             />
             <span>Low Stock Alerts Only</span>
-          </label>
+          </label> */}
         </div>
 
         {/* Category Tabs
@@ -227,7 +227,7 @@ export default function InventoryPage() {
                       </span>
                     </div>
                     {/* Visual Progress bar */}
-                    <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                    {/* <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
                       <div
                         className={`h-full rounded-full transition-all duration-300 ${
                           isLowStock ? "bg-red-500" : "bg-orange-500"
@@ -243,7 +243,7 @@ export default function InventoryPage() {
                     <div className="flex justify-between text-[10px] text-slate-400">
                       <span>Threshold Alert Level:</span>
                       <span className="font-semibold">{item.minStock} {item.unit}</span>
-                    </div>
+                    </div> */}
                   </div>
 
                   {/* Pricing and Action row */}

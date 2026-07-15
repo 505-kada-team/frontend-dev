@@ -1,8 +1,8 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
-  withCredentials: true, // wajib supaya cookie refreshToken httpOnly ikut terkirim
+  baseURL: "https://backend-dev-ap4n.onrender.com/api/v1/",
+  withCredentials: true, //browser mengizinkan pengiriman dan penerimaan cookie secara otomatis untuk refresh token.
 });
 
 // --- state token disimpan di module-level (RAM), bukan di localStorage ---
