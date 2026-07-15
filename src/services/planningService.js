@@ -1,53 +1,81 @@
-// PLACEHOLDER — struktur data di sini sengaja dibuat SAMA PERSIS dengan
-// response backend asli (statusCode, _id, dsb) supaya nanti swap ke axios
-// call yang beneran tidak butuh ubah apa pun di hook/komponen pemanggilnya.
-import { calculateMaterials } from "@/lib/planningCalculations"
+import api from "@/lib/api";
 
-let planningsStore = []
-let nextId = 1
+// ======================
+// GET ALL
+// ======================
 
-const delay = (ms = 300) => new Promise((res) => setTimeout(res, ms))
+export const getPlannings = async () => {
+  try {
+    const response = await api.get("/planning");
 
-export async function getPlannings() {
-  await delay()
-  return [...planningsStore].sort(
-    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-  )
-}
-
-export async function createPlanning({ name, startDate, endDate, menus }) {
-  await delay()
-  const newPlanning = {
-    _id: String(nextId++),
-    name,
-    startDate,
-    endDate,
-    menus, // disimpan mentah, dipakai buat kalkulasi saat detail dibuka
-    createdAt: new Date().toISOString(),
+    // sesuaikan dengan ApiResponse backend
+    return response.data.data || [];
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message ||
+      "Failed to fetch planning data"
+    );
   }
-  planningsStore.push(newPlanning)
-  return newPlanning
-}
+};
 
-export async function getPlanningDetail(id, { recipes, inventories }) {
-  await delay()
-  const planning = planningsStore.find((p) => p._id === id)
-  if (!planning) throw new Error("Planning tidak ditemukan")
+// ======================
+// CREATE
+// ======================
 
-  const materials = calculateMaterials(planning.menus, recipes, inventories)
+export const createPlanning = async (data) => {
+  try {
+    const payload = {
+      name: data.name,
+      startDate: data.startDate,
+      endDate: data.endDate,
 
-  return {
-    planning: {
-      id: planning._id,
-      name: planning.name,
-      startDate: planning.startDate,
-      endDate: planning.endDate,
-    },
-    materials,
+      menus: data.menus.map((menu) => ({
+        menuId: menu.menuId,
+        quantity: Number(menu.quantity),
+      })),
+    };
+
+    const response = await api.post("/planning", payload);
+
+    return response.data.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message ||
+      "Failed to create planning"
+    );
   }
-}
+};
 
-export async function deletePlanning(id) {
-  await delay()
-  planningsStore = planningsStore.filter((p) => p._id !== id)
-}
+// ======================
+// DETAIL
+// ======================
+
+export const getPlanningDetail = async (id) => {
+  try {
+    const response = await api.get(`/planning/${id}`);
+
+    return response.data.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message ||
+      "Failed to fetch planning detail"
+    );
+  }
+};
+
+// ======================
+// DELETE
+// ======================
+
+export const deletePlanning = async (id) => {
+  try {
+    const response = await api.delete(`/planning/${id}`);
+
+    return response.data.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message ||
+      "Failed to delete planning"
+    );
+  }
+};

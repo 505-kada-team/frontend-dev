@@ -17,11 +17,29 @@ export function useLogin() {
 
     setLoading(false);
 
-    if (result.success) {
+   if (result.success) {
       toast.success("Welcome back!");
       navigate("/dashboard");
     } else {
-      toast.error(result.error);
+      // 1. Ambil pesan error dan ubah ke huruf kecil semua agar mudah dicek
+      const errorMessage = result.error?.toLowerCase() || "";
+
+      // 2. Cek apakah pesan error mengandung kata terkait "verifikasi"
+      // NOTE: Sesuaikan kata-kata di bawah ini dengan pesan error ASLI dari backend-mu!
+      const isUnverified = 
+        errorMessage.includes("verify") || 
+        errorMessage.includes("verified") || 
+        errorMessage.includes("verifikasi");
+
+      if (isUnverified) {
+        toast.error("Akun belum terverifikasi. Silakan cek email atau kirim ulang kode.");
+        
+        // 3. Arahkan ke halaman verifikasi dan bawa state email
+        navigate("/verify-email", { state: { email } });
+      } else {
+        // Jika errornya karena hal lain (misal: password salah)
+        toast.error(result.error);
+      }
     }
   };
 

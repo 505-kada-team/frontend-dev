@@ -24,7 +24,7 @@ const dummyRecipes = [
 
 const delay = (ms = 300) => new Promise((res) => setTimeout(res, ms))
 
-export async function getRecipes() {
+export async function getRecipes() {c
   await delay()
   return dummyRecipes
 }
