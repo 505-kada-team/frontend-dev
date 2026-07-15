@@ -5,7 +5,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogMedia, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import RecipeForm from '@/components/shared/RecipeForm';
 import { Search, Plus, Edit2, Trash2, BookOpen, Eye, Info } from 'lucide-react';
+import Pagination from '@/components/shared/Pagination';
 
+const ITEMS_PER_PAGE = 4;
 // ─── Dummy Data (replace with real API call later) ──────────────────────────
 const dummyRecipes = [
   {
@@ -49,11 +51,23 @@ const dummyRecipes = [
     ],
     price: 22000,
   },
+  {
+    id: 5,
+    name: 'Classic Milk Tea',
+    ingredients: [
+      { id: 1, name: 'Black Tea Leaves', quantity: 5, unit: 'gr' },
+      { id: 2, name: 'Tapioca Pearls', quantity: 50, unit: 'gr' },
+      { id: 3, name: 'Fresh Milk', quantity: 200, unit: 'ml' },
+      { id: 4, name: 'Brown Sugar Syrup', quantity: 25, unit: 'ml' },
+    ],
+    price: 22000,
+  },
 ];
 
 export default function RecipePage() {
   const [recipes, setRecipes] = useState(dummyRecipes);
   const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Dialog State
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -85,6 +99,13 @@ export default function RecipePage() {
 
   const filteredRecipes = recipes.filter((r) => r.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
+  const paginatedRecipes = filteredRecipes.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1);
+  };
+
   return (
     <AlertDialog
       open={!!deleteTargetId}
@@ -111,7 +132,7 @@ export default function RecipePage() {
             <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
               <Search className="size-4" />
             </span>
-            <Input placeholder="Search recipes..." className="pl-9 bg-slate-50" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+            <Input placeholder="Search recipes..." className="pl-9 bg-slate-50" value={searchTerm} onChange={handleSearchChange} />
           </div>
         </div>
 
@@ -136,7 +157,7 @@ export default function RecipePage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {filteredRecipes.map((recipe) => (
+                {paginatedRecipes.map((recipe) => (
                   <tr key={recipe.id} onClick={() => setViewingItem(recipe)} className="hover:bg-slate-50 transition-colors cursor-pointer">
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
@@ -160,11 +181,7 @@ export default function RecipePage() {
         </div>
 
         {/* Recipe Count Footer */}
-        {filteredRecipes.length > 0 && (
-          <p className="text-xs text-slate-400 text-right">
-            Showing {filteredRecipes.length} of {recipes.length} recipes
-          </p>
-        )}
+        <Pagination currentPage={currentPage} totalItems={filteredRecipes.length} itemsPerPage={ITEMS_PER_PAGE} onPageChange={setCurrentPage} />
 
         {/* ── View Detail Modal ─────────────────────────────────────── */}
         <Dialog
