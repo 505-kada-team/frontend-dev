@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { getInventories } from "../services/inventoryService"
 
 export function useInventories() {
@@ -6,12 +6,17 @@ export function useInventories() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  useEffect(() => {
+  const fetchItems = useCallback(() => {
+    setLoading(true)
     getInventories()
       .then(setInventories)
       .catch(setError)
       .finally(() => setLoading(false))
   }, [])
 
-  return { inventories, loading, error }
+  useEffect(() => {
+    fetchItems()
+  }, [fetchItems])
+
+  return { inventories, loading, error, refetch: fetchItems }
 }
