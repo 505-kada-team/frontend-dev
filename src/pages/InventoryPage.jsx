@@ -70,12 +70,17 @@ export default function InventoryPage() {
   return (
     <AlertDialog open={!!deleteTargetId} onOpenChange={(open) => { if (!open) setDeleteTargetId(null) }}>
       <div className="space-y-6">
-      {/* Top Header Row */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800">Inventory Items</h1>
-          <p className="text-sm text-slate-500">Manage ingredients, stock levels, and alert settings</p>
-        </div>
+     {/* Top Header Row */}
+<div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+  <div>
+    <h1 className="text-2xl font-bold text-foreground">
+      Inventory Items
+    </h1>
+
+    <p className="text-sm text-muted-foreground">
+      Manage ingredients, stock levels, and alert settings
+    </p>
+  </div>
         <div className="flex gap-2">
           <Button
             variant="outline"

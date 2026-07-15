@@ -51,14 +51,18 @@ export default function SellingPlanPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-800">Selling Plan</h1>
-        <p className="text-sm text-slate-500">
-          Pilih resep yang ingin dijual dan tentukan jumlah produksinya
-        </p>
-        <p className="text-sm text-slate-500">
-          Sistem akan otomatis menghitung kecukupan bahan dari inventori
-        </p>
-      </div>
+  <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+    Selling Plan
+  </h1>
+
+  <p className="text-sm text-slate-600 dark:text-slate-400">
+    Pilih resep yang ingin dijual dan tentukan jumlah produksinya
+  </p>
+
+  <p className="text-sm text-slate-600 dark:text-slate-400">
+    Sistem akan otomatis menghitung kecukupan bahan dari inventori
+  </p>
+</div>
 
       <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
         <table className="w-full text-sm">
