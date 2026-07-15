@@ -30,19 +30,29 @@ const blockInvalidNumberKeys = (e) => {
 
 const inventorySchema = z
   .object({
-    ingredientName: z.string().min(2),
+    ingredientName: z.string().min(1, 'Item name is required').max(100, 'Name is too long'),
 
     description: z.string().optional(),
 
-    quantity: z.coerce.number().min(0),
+    quantity: z
+    .string()
+    .min(1, 'Quantity is required')
+    .refine((val) => !isNaN(Number(val)) && Number(val) >= 0, {
+      message: 'Quantity must be a positive number',
+    }),
 
-    unit: z.string(),
+    unit: z.string().min(1, 'Unit is required'),
 
-    unitCost: z.coerce.number().min(0),
+    unitCost: z
+    .string()
+    .min(1, 'Price is required')
+    .refine((val) => !isNaN(Number(val)) && Number(val) >= 0, {
+      message: 'Price must be a positive number',
+    }),
 
-    validFrom: z.string().min(1),
+    validFrom: z.string().min(1, 'Start date is required'),
 
-    validTo: z.string().min(1),
+    validTo: z.string().min(1, 'End date is required'),
   })
   .refine(
     (data) =>
