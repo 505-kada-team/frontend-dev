@@ -3,11 +3,7 @@ import { LogOut } from "lucide-react";
 import SidebarLogo from "./SidebarLogo";
 import SidebarMenu from "./SidebarMenu";
 
-export default function AppSidebar({
-  collapsed,
-  navItems,
-  handleLogout,
-}) {
+export default function AppSidebar({ collapsed, navItems, handleLogout }) {
   return (
     <aside
       className={`
@@ -31,7 +27,6 @@ export default function AppSidebar({
       {/* Background Effect */}
 
       <div className="absolute inset-0 overflow-hidden">
-
         <div className="absolute -top-24 -right-20 h-64 w-64 rounded-full bg-orange-500/20 blur-3xl" />
 
         <div className="absolute bottom-0 -left-20 h-64 w-64 rounded-full bg-blue-500/20 blur-3xl" />
@@ -46,23 +41,18 @@ export default function AppSidebar({
             backgroundSize: "40px 40px",
           }}
         />
-
       </div>
 
       {/* Content */}
 
       <div className="relative flex h-full flex-col px-4 py-6">
-
         {/* Logo */}
 
         <SidebarLogo collapsed={collapsed} />
 
         {/* Menu */}
 
-        <SidebarMenu
-          navItems={navItems}
-          collapsed={collapsed}
-        />
+        <SidebarMenu navItems={navItems} collapsed={collapsed} />
 
         {/* Logout */}
 
@@ -84,25 +74,13 @@ export default function AppSidebar({
             hover:bg-red-500
             hover:text-white
 
-            ${
-              collapsed
-                ? "justify-center"
-                : "justify-center gap-2 px-4"
-            }
+            ${collapsed ? "justify-center" : "justify-center gap-2 px-4"}
           `}
         >
-          <LogOut
-            size={18}
-            className="shrink-0"
-          />
+          <LogOut size={18} className="shrink-0" />
 
-          {!collapsed && (
-            <span className="font-medium">
-              Logout
-            </span>
-          )}
+          {!collapsed && <span className="font-medium">Logout</span>}
         </button>
-
       </div>
     </aside>
   );

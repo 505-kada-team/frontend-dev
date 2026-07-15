@@ -1,16 +1,17 @@
-import { useEffect, useState } from "react";
-import { Outlet, NavLink, Navigate } from "react-router-dom";
+import { useState } from "react";
+import { Outlet, Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { toast } from "react-hot-toast";
 import {
   LayoutDashboard,
   Package,
   BookOpen,
   TrendingUp,
-  User,
-  LogOut,
-  Sun,
-  Moon,
-  Coffee,
+  // User,
+  // LogOut,
+  // Sun,
+  // Moon,
+  // Coffee,
   Settings,
 } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
@@ -48,6 +49,7 @@ const navItems = [
 export default function MainLayout() {
   const { dark, toggleTheme } = useTheme();
   const { user, isLoading, logout } = useAuth();
+  const [collapsed, setCollapsed] = useState(false);
 
   const toggleSidebar = () => {
     setCollapsed((prev) => !prev);
