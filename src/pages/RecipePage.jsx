@@ -119,11 +119,16 @@ export default function RecipePage() {
     >
       <div className="space-y-6">
         {/* Header Row */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-slate-800">Recipes</h1>
-            <p className="text-sm text-slate-500">Manage your drink recipes and ingredient compositions</p>
-          </div>
+<div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+  <div>
+    <h1 className="text-2xl font-bold text-foreground">
+      Recipes
+    </h1>
+
+    <p className="text-sm text-muted-foreground">
+      Manage your drink recipes and ingredient compositions
+    </p>
+  </div>
           <Button onClick={handleOpenAdd} className="bg-orange-500 hover:bg-orange-600 text-white rounded-full flex items-center gap-1.5 px-4 h-9 cursor-pointer transition-colors">
             <Plus className="size-4" />
             Add Recipe
