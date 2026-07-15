@@ -1,15 +1,18 @@
-import { Outlet, NavLink } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Outlet, NavLink, Navigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import {
   LayoutDashboard,
   Package,
   BookOpen,
   Settings,
   TrendingUp,
+  User,
   LogOut,
   Sun,
   Moon,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 const navItems = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -21,8 +24,9 @@ const navItems = [
 
 export default function MainLayout() {
   const [dark, setDark] = useState(false);
+  const { user, isLoading, logout } = useAuth();
 
-  useEffect(() => {
+    useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
 
     if (savedTheme === "dark") {
@@ -30,6 +34,24 @@ export default function MainLayout() {
       setDark(true);
     }
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  //pengecekan oleh authcontext kalau tidak user di tendang ke login
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  const handleLogout = async () => {
+    await logout();
+    toast.success("Logged out successfully");
+  };
 
   const toggleTheme = () => {
     const next = !dark;
@@ -44,6 +66,10 @@ export default function MainLayout() {
       localStorage.setItem("theme", "light");
     }
   };
+
+  // Ekstrak nama dan inisial secara dinamis (fallback ke 'User' jika data belum load)
+  const userName = user?.name || "User";
+  const userInitial = userName.charAt(0).toUpperCase();
 
   return (
     <div className="flex min-h-screen bg-background text-foreground transition-colors">
@@ -68,7 +94,10 @@ export default function MainLayout() {
           ))}
         </nav>
 
-        <button className="flex items-center justify-center gap-2 border border-border rounded-lg py-2 text-red-500 hover:bg-muted transition">
+        <button
+          onClick={handleLogout}
+          className="flex items-center justify-center gap-2 border border-border rounded-lg py-2 text-red-500 hover:bg-muted transition cursor-pointer"
+        >
           <LogOut size={16} />
           Logout
         </button>
@@ -87,11 +116,12 @@ export default function MainLayout() {
 
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center text-white font-semibold">
-              T
+              {userInitial}
             </div>
 
+            {/* Tampilkan Nama Dinamis */}
             <span className="text-sm font-medium text-foreground">
-              Tompel
+              {userName}
             </span>
           </div>
         </header>
