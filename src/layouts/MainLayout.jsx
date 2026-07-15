@@ -87,14 +87,14 @@ export default function MainLayout() {
             </div>
 
             {/* Bagian Profil Dinamis (Dari Merge Conflict) */}
-            <div className="flex items-center gap-2">
+            {/* <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center text-white font-semibold">
                 {userInitial}
               </div>
               <span className="text-sm font-medium text-white">
                 {userName}
               </span>
-            </div>
+            </div> */}
             <p className="mt-3 text-xs uppercase tracking-[3px] text-slate-400">
               Inventory Management
             </p>

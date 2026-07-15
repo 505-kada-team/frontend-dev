@@ -34,11 +34,14 @@ export function refreshToken() {
   return api.post("/auth/refresh").then(unwrap);
 }
 
-export function changePassword({ oldPassword, newPassword }) {
-  return api
-    .patch("/auth/change-password", { oldPassword, newPassword })
-    .then(unwrap);
-}
+export const changePassword = async (data) => {
+  const response = await api.patch("/auth/change-password", {
+    oldPassword: data.oldPassword,
+    newPassword: data.newPassword,
+  });
+
+  return response.data;
+};
 
 export function forgotPassword(email) {
   return api.post("/auth/forgot-password", { email }).then(unwrap);

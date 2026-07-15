@@ -45,19 +45,23 @@ export const getInventoryById = async (id) => {
 // 3. Menambahkan data baru
 export const createInventory = async (data) => {
   try {
-    // Terjemahkan data dari UI (name, price) ke format Backend (ingredientName, unitCost)
     const payload = {
-      ingredientName: data.name,
+      ingredientName: data.ingredientName,
       description: data.description,
       unit: data.unit,
       quantity: Number(data.quantity),
-      unitCost: Number(data.price),
-      // minStock: Number(data.minStock || 0) -> Masukkan ke backend jika backend punya field ini
+      unitCost: Number(data.unitCost),
+      validFrom: data.validFrom,
+      validTo: data.validTo,
     };
 
+    console.log("Payload:", payload);
+
     const response = await api.post("/inventory", payload);
+
     return response.data;
   } catch (error) {
+    console.error(error.response?.data);
     throw new Error(error.response?.data?.message || "Gagal menambahkan data");
   }
 };
@@ -66,14 +70,17 @@ export const createInventory = async (data) => {
 export const updateInventory = async (id, data) => {
   try {
     const payload = {
-      ingredientName: data.name,
+      ingredientName: data.ingredientName,
       description: data.description,
       unit: data.unit,
       quantity: Number(data.quantity),
-      unitCost: Number(data.price),
+      unitCost: Number(data.unitCost),
+      validFrom: data.validFrom,
+      validTo: data.validTo,
     };
 
-    const response = await api.patch(`/inventories/${id}`, payload);
+    const response = await api.patch(`/inventory/${id}`, payload);
+
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.message || "Gagal mengubah data");
@@ -83,7 +90,7 @@ export const updateInventory = async (id, data) => {
 // 5. Menghapus data
 export const deleteInventory = async (id) => {
   try {
-    const response = await api.delete(`/inventories/${id}`);
+    const response = await api.delete(`/inventory/${id}`);
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.message || "Gagal menghapus data");

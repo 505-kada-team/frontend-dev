@@ -3,7 +3,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Loader2 } from "lucide-react";
-import { toast } from  "react-hot-toast";
+import { toast } from "react-hot-toast";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,10 +17,7 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 
-import {
-  createInventory,
-  updateInventory,
-} from "@/services/inventoryService";
+import { createInventory, updateInventory } from "@/services/inventoryService";
 
 import { UNIT_OPTIONS } from "@/lib/constants";
 
@@ -31,34 +28,30 @@ const blockInvalidNumberKeys = (e) => {
   if (["-", "+", "e", "E"].includes(e.key)) e.preventDefault();
 };
 
-const inventorySchema = z.object({
-  name: z.string().min(1, "Item name is required"),
+const inventorySchema = z
+  .object({
+    ingredientName: z.string().min(2),
 
-  quantity: z
-    .string()
-    .min(1, "Quantity is required")
-    .refine((val) => !isNaN(Number(val)) && Number(val) >= 0, {
-      message: "Quantity must be a positive number",
-    }),
+    description: z.string().optional(),
 
-  unit: z.string().min(1, "Unit is required"),
+    quantity: z.coerce.number().min(0),
 
-  price: z
-    .string()
-    .min(1, "Price is required")
-    .refine((val) => !isNaN(Number(val)) && Number(val) >= 0, {
-      message: "Price must be a positive number",
-    }),
+    unit: z.string(),
 
-  minStock: z
-    .string()
-    .min(1, "Minimum stock is required")
-    .refine((val) => !isNaN(Number(val)) && Number(val) >= 0, {
-      message: "Minimum stock must be a positive number",
-    }),
+    unitCost: z.coerce.number().min(0),
 
-  description: z.string().optional(),
-});
+    validFrom: z.string().min(1),
+
+    validTo: z.string().min(1),
+  })
+  .refine(
+    (data) =>
+      new Date(data.validTo) > new Date(data.validFrom),
+    {
+      path: ["validTo"],
+      message: "Valid To must be later than Valid From",
+    }
+  );
 
 export default function InventoryForm({
   initialData,
@@ -77,11 +70,16 @@ export default function InventoryForm({
   } = useForm({
     resolver: zodResolver(inventorySchema),
     defaultValues: {
-      name: initialData?.name || "",
+      ingredientName: initialData?.ingredientName || "",
       quantity: initialData?.quantity?.toString() || "",
       unit: initialData?.unit || "kg",
-      price: initialData?.price?.toString() || "",
-      minStock: initialData?.minStock?.toString() || "",
+      unitCost: initialData?.unitCost?.toString() || "",
+      validFrom: initialData?.validFrom
+        ? new Date(initialData.validFrom).toISOString().split("T")[0]
+        : "",
+      validTo: initialData?.validTo
+        ? new Date(initialData.validTo).toISOString().split("T")[0]
+        : "",
       description: initialData?.description || "",
     },
   });
@@ -92,9 +90,6 @@ export default function InventoryForm({
     try {
       const payload = {
         ...data,
-        quantity: Number(data.quantity),
-        price: Number(data.price),
-        minStock: Number(data.minStock),
       };
 
       if (isEditMode) {
@@ -127,7 +122,7 @@ export default function InventoryForm({
         <Input
           id="name"
           placeholder="e.g. Matcha Powder"
-          {...register("name")}
+          {...register("ingredientName")}
         />
 
         {errors.name && (
@@ -153,9 +148,7 @@ export default function InventoryForm({
           />
 
           {errors.quantity && (
-            <p className="text-xs text-red-500">
-              {errors.quantity.message}
-            </p>
+            <p className="text-xs text-red-500">{errors.quantity.message}</p>
           )}
         </div>
 
@@ -166,20 +159,14 @@ export default function InventoryForm({
             name="unit"
             control={control}
             render={({ field }) => (
-              <Select
-                value={field.value}
-                onValueChange={field.onChange}
-              >
+              <Select value={field.value} onValueChange={field.onChange}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select Unit" />
                 </SelectTrigger>
 
                 <SelectContent>
                   {UNIT_OPTIONS.map((item) => (
-                    <SelectItem
-                      key={item.value}
-                      value={item.value}
-                    >
+                    <SelectItem key={item.value} value={item.value}>
                       {item.label}
                     </SelectItem>
                   ))}
@@ -189,17 +176,52 @@ export default function InventoryForm({
           />
 
           {errors.unit && (
-            <p className="text-xs text-red-500">
-              {errors.unit.message}
-            </p>
+            <p className="text-xs text-red-500">{errors.unit.message}</p>
           )}
         </div>
       </div>
 
-      {/* Price & Minimum Stock */}
+      <div className="grid grid-cols-2 gap-4">
+
+      {/* date */}
+      <div className="space-y-1">
+        <Label htmlFor="validFrom">Valid From</Label>
+
+        <Input
+          type="date"
+          id="validFrom"
+          {...register("validFrom")}
+        />
+
+        {errors.validFrom && (
+          <p className="text-xs text-red-500">
+            {errors.validFrom.message}
+          </p>
+        )}
+      </div>
+
+      <div className="space-y-1">
+        <Label htmlFor="validTo">Valid To</Label>
+
+        <Input
+          type="date"
+          id="validTo"
+          {...register("validTo")}
+        />
+
+        {errors.validTo && (
+          <p className="text-xs text-red-500">
+            {errors.validTo.message}
+          </p>
+        )}
+      </div>
+
+    </div>
+
+      {/* Price*/}
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1">
-          <Label htmlFor="price">Price (Rp)</Label>
+          <Label htmlFor="price">Unit Cost (Rp)</Label>
 
           <Input
             id="price"
@@ -209,34 +231,11 @@ export default function InventoryForm({
             placeholder="50000"
             onKeyDown={blockInvalidNumberKeys}
             onWheel={(e) => e.target.blur()}
-            {...register("price")}
+            {...register("unitCost")}
           />
 
           {errors.price && (
-            <p className="text-xs text-red-500">
-              {errors.price.message}
-            </p>
-          )}
-        </div>
-
-        <div className="space-y-1">
-          <Label htmlFor="minStock">Minimum Stock</Label>
-
-          <Input
-            id="minStock"
-            type="number"
-            min={0}
-            className={noSpinnerClass}
-            placeholder="3"
-            onKeyDown={blockInvalidNumberKeys}
-            onWheel={(e) => e.target.blur()}
-            {...register("minStock")}
-          />
-
-          {errors.minStock && (
-            <p className="text-xs text-red-500">
-              {errors.minStock.message}
-            </p>
+            <p className="text-xs text-red-500">{errors.price.message}</p>
           )}
         </div>
       </div>
@@ -253,9 +252,7 @@ export default function InventoryForm({
         />
 
         {errors.description && (
-          <p className="text-xs text-red-500">
-            {errors.description.message}
-          </p>
+          <p className="text-xs text-red-500">{errors.description.message}</p>
         )}
       </div>
 

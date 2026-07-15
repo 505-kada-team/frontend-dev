@@ -2,10 +2,28 @@
 // Satu sumber untuk daftar unit, dipakai di InventoryForm & RecipeForm
 // supaya value-nya selalu konsisten. Sesuaikan dengan backend
 export const UNIT_OPTIONS = [
-  { value: "gram", label: "Gram (gr)" },
-  { value: "kg", label: "Kilogram (kg)" },
-  { value: "ml", label: "Mililiter (ml)" },
-  { value: "liter", label: "Liter (L)" },
-  { value: "pcs", label: "Pieces (pcs)" },
-  { value: "butir", label: "Butir (btr)"},
-]
+  {
+    value: "gram",
+    label: "Gram",
+  },
+  {
+    value: "kg",
+    label: "Kilogram",
+  },
+  {
+    value: "ml",
+    label: "Milliliter",
+  },
+  {
+    value: "liter",
+    label: "Liter",
+  },
+  {
+    value: "pcs",
+    label: "PCS",
+  },
+  {
+    value: "piece",
+    label: "Piece",
+  },
+];

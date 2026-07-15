@@ -1,4 +1,5 @@
 import { useState } from "react";
+import ChangePasswordForm from "@/components/shared/ChangePasswordForm";
 import {
   Sun,
   Moon,
@@ -15,11 +16,6 @@ import { useTheme } from "../context/ThemeContext";
 export default function SettingsPage() {
   const { dark, toggleTheme } = useTheme();
 
-  const [password, setPassword] = useState({
-    current: "",
-    new: "",
-    confirm: "",
-  });
 
   const user = {
     name: "Administrator",
@@ -34,26 +30,6 @@ export default function SettingsPage() {
     window.location.href = "/login";
   };
 
-  const handlePasswordChange = (e) => {
-    e.preventDefault();
-
-    if (password.new !== password.confirm) {
-      alert("New password and confirmation password do not match.");
-      return;
-    }
-
-    // TODO:
-    // connect to backend
-    // PUT /api/auth/change-password
-
-    alert("Password changed successfully.");
-
-    setPassword({
-      current: "",
-      new: "",
-      confirm: "",
-    });
-  };
 
   return (
     <div className="mx-auto max-w-5xl space-y-8">
@@ -175,101 +151,18 @@ export default function SettingsPage() {
 
       {/* ================= Security ================= */}
 
-      <form
-        onSubmit={handlePasswordChange}
-        className="rounded-2xl border border-border bg-card p-6 shadow-sm"
-      >
+     <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
 
-        <div className="mb-6 flex items-center gap-3">
+  <div className="mb-6 flex items-center gap-3">
+      <ShieldCheck className="text-primary" />
+      <h2 className="text-xl font-semibold">
+        Security
+      </h2>
+    </div>
 
-          <ShieldCheck className="text-primary" />
+    <ChangePasswordForm />
 
-          <h2 className="text-xl font-semibold">
-            Security
-          </h2>
-
-        </div>
-
-        <div className="grid gap-5">
-
-          <div>
-
-            <label className="mb-2 block text-sm font-medium">
-              Current Password
-            </label>
-
-            <input
-              type="password"
-              value={password.current}
-              onChange={(e) =>
-                setPassword({
-                  ...password,
-                  current: e.target.value,
-                })
-              }
-              className="w-full rounded-xl border border-border bg-background px-4 py-3 outline-none focus:border-primary"
-            />
-
-          </div>
-
-          <div>
-
-            <label className="mb-2 block text-sm font-medium">
-              New Password
-            </label>
-
-            <input
-              type="password"
-              value={password.new}
-              onChange={(e) =>
-                setPassword({
-                  ...password,
-                  new: e.target.value,
-                })
-              }
-              className="w-full rounded-xl border border-border bg-background px-4 py-3 outline-none focus:border-primary"
-            />
-
-          </div>
-
-          <div>
-
-            <label className="mb-2 block text-sm font-medium">
-              Confirm Password
-            </label>
-
-            <input
-              type="password"
-              value={password.confirm}
-              onChange={(e) =>
-                setPassword({
-                  ...password,
-                  confirm: e.target.value,
-                })
-              }
-              className="w-full rounded-xl border border-border bg-background px-4 py-3 outline-none focus:border-primary"
-            />
-
-          </div>
-
-          <div className="flex justify-end">
-
-            <button
-              type="submit"
-              className="flex items-center gap-2 rounded-xl bg-primary px-6 py-3 font-medium text-white transition hover:opacity-90"
-            >
-
-              <Lock size={18} />
-
-              Change Password
-
-            </button>
-
-          </div>
-
-        </div>
-
-      </form>
+  </div>
 
       {/* ================= About ================= */}
 
