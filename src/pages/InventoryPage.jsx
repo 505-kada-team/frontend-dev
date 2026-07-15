@@ -64,8 +64,9 @@ export default function InventoryPage() {
         {/* Top Header Row */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-slate-800">Inventory Items</h1>
-            <p className="text-sm text-slate-500">Manage ingredients, stock levels, and alert settings</p>
+            <h1 className="text-2xl font-bold text-foreground">Inventory Items</h1>
+
+            <p className="text-sm text-muted-foreground">Manage ingredients, stock levels, and alert settings</p>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" size="icon" onClick={refetch} disabled={loading} className="rounded-full cursor-pointer bg-white" title="Refresh Data">
