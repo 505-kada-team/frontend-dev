@@ -1,6 +1,8 @@
+import { useState } from 'react'
 import { Link } from "react-router-dom"
-import { Mail, Lock } from "lucide-react"
+import { Mail, Lock, Eye, EyeOff } from "lucide-react"
 
+import { useLogin } from '@/hooks/useLogin' // Import hook yang baru dibuat
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -14,6 +16,14 @@ import {
 } from "@/components/ui/card"
 
 export default function LoginPage() {
+  // Hanya state UI yang tersisa di sini
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  
+  // Ambil fungsi dan loading state dari hook
+  const { handleLoginSubmit, loading } = useLogin()
+
   return (
     <Card className="w-full max-w-md shadow-lg border border-slate-200 bg-white">
       <CardHeader className="space-y-1 text-center">
@@ -24,7 +34,9 @@ export default function LoginPage() {
       </CardHeader>
 
       <CardContent>
-        <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
+        {/* Pass email dan password ke handler */}
+        <form onSubmit={(e) => handleLoginSubmit(e, email, password)} className="space-y-4">
+          
           {/* Email Field */}
           <div className="space-y-1.5">
             <Label htmlFor="email" className="text-slate-700">
@@ -35,10 +47,13 @@ export default function LoginPage() {
                 <Mail className="size-4" />
               </span>
               <Input
-                id="email"
                 type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
                 placeholder="name@example.com"
                 className="pl-10"
+                disabled={loading}
               />
             </div>
           </div>
@@ -53,23 +68,35 @@ export default function LoginPage() {
                 <Lock className="size-4" />
               </span>
               <Input
-                id="password"
-                type="password"
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
                 placeholder="••••••••"
                 className="pl-10"
+                disabled={loading}
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
             </div>
           </div>
 
-          {/* Submit Button */}
-          <Link to="/dashboard" className="block w-full mt-2">
-            <Button
-              type="submit"
-              className="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium h-10 transition-colors flex items-center justify-center gap-2 rounded-full cursor-pointer"
-            >
-              Sign In
-            </Button>
-          </Link>
+          <Button
+            type="submit"
+            disabled={loading}
+            className="w-full mt-2 bg-orange-500 hover:bg-orange-600 text-white font-medium h-10 transition-colors flex items-center justify-center gap-2 rounded-full cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
+          >
+            {loading ? (
+              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            ) : (
+              'Sign In'
+            )}
+          </Button>
         </form>
       </CardContent>
 
@@ -83,6 +110,8 @@ export default function LoginPage() {
             Sign up
           </Link>
         </p>
+        <Link to="/forgot-password" className="block text-center text-sm text-orange-500 hover:text-orange-700 mt-4">
+        Forgot password?</Link>
       </CardFooter>
     </Card>
   )

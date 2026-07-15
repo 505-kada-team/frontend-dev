@@ -16,7 +16,8 @@ const blockInvalidNumberKeys = (e) => {
 };
 
 const recipeSchema = z.object({
-  name: z.string().min(1, 'Recipe name is required').max(100, 'Name is too long'),
+  name: z.string().min(1, "Recipe name is required").max(100, "Name is too long"),
+  description: z.string().optional(),
   price: z
     .string()
     .min(1, 'Price is required')
@@ -61,8 +62,9 @@ export default function RecipeForm({ initialData, onSubmitSuccess, onCancel }) {
   } = useForm({
     resolver: zodResolver(recipeSchema),
     defaultValues: {
-      name: initialData?.name || '',
-      price: initialData?.price?.toString() || '',
+      name: initialData?.name || "",
+      description: initialData?.description || "",
+      price: initialData?.price?.toString() || "",
       ingredients: initialData?.ingredients?.length
         ? initialData.ingredients.map((ing) => ({
             inventoryId: ing.inventoryId ? String(ing.inventoryId) : '',
@@ -255,8 +257,34 @@ export default function RecipeForm({ initialData, onSubmitSuccess, onCancel }) {
         <Label htmlFor="recipe-price" className="text-slate-700">
           Price per Recipe (Rp)
         </Label>
-        <Input id="recipe-price" type="number" min={0} placeholder="e.g. 25000" className={noSpinnerClass} onKeyDown={blockInvalidNumberKeys} onWheel={(e) => e.target.blur()} {...register('price')} aria-invalid={!!errors.price} />
-        {errors.price && <p className="text-xs text-destructive mt-1">{errors.price.message}</p>}
+        <Input
+          id="recipe-price"
+          type="number"
+          min={0}
+          placeholder="e.g. 25000"
+          className={noSpinnerClass}
+          onKeyDown={blockInvalidNumberKeys}
+          onWheel={(e) => e.target.blur()}
+          {...register("price")}
+          aria-invalid={!!errors.price}
+        />
+        {errors.price && (
+          <p className="text-xs text-destructive mt-1">{errors.price.message}</p>
+        )}
+      </div>
+      
+      {/* Tambahkan di atas atau di bawah input Price */}
+      <div className="space-y-1.5">
+        <Label htmlFor="recipe-desc" className="text-slate-700">Description</Label>
+        <Input
+          id="recipe-desc"
+          placeholder="e.g. A sweet and creamy matcha drink"
+          {...register("description")} // <-- MENGHUBUNGKAN KE REACT HOOK FORM
+          aria-invalid={!!errors.description}
+        />
+        {errors.description && (
+          <p className="text-xs text-destructive mt-1">{errors.description.message}</p>
+        )}
       </div>
 
       {/* Action Buttons */}
