@@ -15,7 +15,7 @@ export const UNIT_CATEGORIES = {
     base: "ml",
     units: {
       ml: { label: "Mililiter (ml)", factor: 1 },
-      L: { label: "Liter (L)", factor: 1000 },
+      liter: { label: "Liter (L)", factor: 1000 },
     },
   },
   count: {
@@ -59,4 +59,14 @@ export function convertFromBase(baseQuantity, targetUnit) {
   const category = getCategoryOfUnit(targetUnit)
   if (!category) return baseQuantity
   return baseQuantity / UNIT_CATEGORIES[category].units[targetUnit].factor
+}
+
+// Konversi langsung dari satu unit ke unit lain (kategori sama).
+// Dipakai saat submit form: apa pun unit yang user pilih, hasil akhirnya
+// dikonversi ke unit ASLI si Inventory sebelum dikirim ke backend
+// (backend cuma terima quantityNeeded dalam satuan Inventory-nya).
+export function convertUnits(quantity, fromUnit, toUnit) {
+  if (fromUnit === toUnit) return quantity
+  const base = convertToBase(quantity, fromUnit)
+  return convertFromBase(base, toUnit)
 }
