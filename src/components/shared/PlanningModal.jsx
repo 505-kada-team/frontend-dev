@@ -49,10 +49,9 @@ const planningSchema = z
   });
 
 export default function PlanningModal({ open, onOpenChange }) {
-  const { recipes, loading: loadingRecipes } = useRecipes();
+  const { recipes, loading: loadingRecipes } = useRecipes(open);
+  const { plannings, loading: loadingPlannings, refetch } = usePlannings(open);
   const { inventories } = useInventories();
-  const { plannings, loading: loadingPlannings, refetch } = usePlannings();
-
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [viewingId, setViewingId] = useState(null);
 
