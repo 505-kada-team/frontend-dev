@@ -32,6 +32,7 @@ export function useVerifyEmail() {
     try {
       await sendVerificationEmail(email);
       toast.success('Verification code sent');
+
     } catch (error) {
       const errMsg = error.response?.data?.message || error.message || 'Failed to resend code';
       toast.error(errMsg);
