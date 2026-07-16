@@ -7,10 +7,12 @@ export function usePlannings(enabled = true) {
   const [error, setError] = useState(null)
 
   const fetchPlannings = useCallback(async () => {
+    if (!enabled) return; // Tambahkan proteksi agar tidak fetch kalau tidak di-enable
     setLoading(true)
     setError(null)
     try {
-      const data = await getPlannings({ limit: 100})
+      // Hapus { limit: 100 } karena API belum mendukung pagination
+      const data = await getPlannings() 
       setPlannings(Array.isArray(data) ? data : [])
     } catch (err) {
       setError(err)
