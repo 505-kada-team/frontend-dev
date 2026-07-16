@@ -56,10 +56,12 @@ export function AuthProvider({ children }) {
         // B. Jika sukses dapet token, langsung minta data profil
         const meRes = await api.get("/auth/me");
         if (mounted) setUser(meRes.data.data);
-
       } catch (error) {
         // Tampilkan error ini di console untuk proses investigasi
-        console.error("Gagal restore session (F5):", error.response?.data || error.message);
+        console.error(
+          "Gagal restore session (F5):",
+          error.response?.data || error.message,
+        );
         if (mounted) setUser(null);
       } finally {
         if (mounted) setIsLoading(false);
@@ -75,25 +77,27 @@ export function AuthProvider({ children }) {
 
   const login = useCallback(async (email, password) => {
     try {
-        const { data } = await api.post(
-          "/auth/login",
-          { email, password },
-          { headers: { "x-platform": "web" } },
-        );
-        
-        setAccessToken(data.data.accessToken);
-        setUser(data.data.user);
-        
-        // Kembalikan objek success: true agar hook useLogin bisa membacanya
-        return { success: true }; 
-        
-      } catch (error) {
-        // Tangkap pesan error dari backend dan kembalikan ke hook untuk dijadikan Toast
-        const errorMessage = error.response?.data?.message || error.message || "Gagal melakukan login";
-        
-        return { success: false, error: errorMessage };
-      }
-    }, []);
+      const { data } = await api.post(
+        "/auth/login",
+        { email, password },
+        { headers: { "x-platform": "web" } },
+      );
+
+      setAccessToken(data.data.accessToken);
+      setUser(data.data.user);
+
+      // Kembalikan objek success: true agar hook useLogin bisa membacanya
+      return { success: true };
+    } catch (error) {
+      // Tangkap pesan error dari backend dan kembalikan ke hook untuk dijadikan Toast
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Gagal melakukan login";
+
+      return { success: false, error: errorMessage };
+    }
+  }, []);
 
   const logout = useCallback(async () => {
     try {
