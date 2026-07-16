@@ -1,9 +1,16 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 import { useSaleCart } from "@/hooks/useSaleCart";
 import { useCreateSale } from "@/hooks/useSales";
-import { DUMMY_MENUS } from "@/data/dummyMenus";
+import { useRecipes } from "@/hooks/useRecipes";
 import { formatRupiah } from "@/lib/format";
 
 export default function SaleCartForm({ onSaleCreated }) {
@@ -11,6 +18,7 @@ export default function SaleCartForm({ onSaleCreated }) {
   const [quantity, setQuantity] = useState("1");
   const [successMessage, setSuccessMessage] = useState("");
 
+  const { recipes, loading: menusLoading, error: menusError } = useRecipes();
   const {
     cartItems,
     addItem,
@@ -22,13 +30,28 @@ export default function SaleCartForm({ onSaleCreated }) {
   } = useSaleCart();
   const { submitSale, isSubmitting, error } = useCreateSale();
 
+  // recipeService tidak melewati mapper (tidak seperti menu.service.js),
+  // jadi field id defensif sama seperti pola di PlanningModal: r.id || r._id
+  const menuItems = recipes.map((r) => ({
+    value: String(r.id || r._id),
+    label: `${r.name} — ${formatRupiah(r.sellingPrice)}`,
+  }));
+
+  const selectedMenu =
+    recipes.find((r) => String(r.id || r._id) === selectedMenuId) ?? null;
+
   const handleAddItem = () => {
-    const menu = DUMMY_MENUS.find((m) => m.id === selectedMenuId);
     const qty = Number(quantity);
+    if (!selectedMenu || !Number.isInteger(qty) || qty <= 0) return;
 
-    if (!menu || !Number.isInteger(qty) || qty <= 0) return;
-
-    addItem(menu, qty);
+    addItem(
+      {
+        id: selectedMenu.id || selectedMenu._id,
+        name: selectedMenu.name,
+        price: selectedMenu.sellingPrice,
+      },
+      qty,
+    );
     setSelectedMenuId("");
     setQuantity("1");
   };
@@ -57,20 +80,27 @@ export default function SaleCartForm({ onSaleCreated }) {
         </p>
       </div>
 
-      {/* Form tambah item */}
       <div className="flex flex-col sm:flex-row gap-3">
-        <select
+        <Select
+          items={menuItems}
           value={selectedMenuId}
-          onChange={(e) => setSelectedMenuId(e.target.value)}
-          className="flex-1 h-9 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-orange-400"
+          onValueChange={setSelectedMenuId}
+          disabled={menusLoading || recipes.length === 0}
         >
-          <option value="">Pilih menu…</option>
-          {DUMMY_MENUS.map((menu) => (
-            <option key={menu.id} value={menu.id}>
-              {menu.name} — {formatRupiah(menu.price)}
-            </option>
-          ))}
-        </select>
+          <SelectTrigger className="flex-1 w-full min-w-0">
+            <SelectValue
+              placeholder={menusLoading ? "Memuat menu…" : "Pilih menu…"}
+              className="truncate"
+            />
+          </SelectTrigger>
+          <SelectContent>
+            {menuItems.map((item) => (
+              <SelectItem key={item.value} value={item.value}>
+                {item.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
         <Input
           type="number"
@@ -84,14 +114,23 @@ export default function SaleCartForm({ onSaleCreated }) {
         <Button
           type="button"
           onClick={handleAddItem}
-          disabled={!selectedMenuId}
+          disabled={!selectedMenu}
           className="bg-slate-900 hover:bg-slate-800 text-white rounded-md h-9 px-4"
         >
           Tambah
         </Button>
       </div>
 
-      {/* Tabel keranjang */}
+      {menusError && (
+        <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-md px-3 py-2">
+          Gagal memuat daftar menu:{" "}
+          {menusError.response?.data?.message || menusError.message}
+        </p>
+      )}
+      {!menusLoading && !menusError && recipes.length === 0 && (
+        <p className="text-sm text-slate-400 italic">Belum ada menu tersedia</p>
+      )}
+
       {cartItems.length > 0 ? (
         <div className="border border-slate-100 rounded-xl overflow-hidden">
           <table className="w-full text-sm">
@@ -153,12 +192,9 @@ export default function SaleCartForm({ onSaleCreated }) {
         </p>
       )}
 
-      {/* Estimasi total (bukan profit asli — profit sebenarnya dihitung backend) */}
       <div className="flex items-center justify-between border-t border-slate-100 pt-4">
         <div>
-          <p className="text-xs text-slate-400">
-            Estimasi total (harga jual dummy)
-          </p>
+          <p className="text-xs text-slate-400">Estimasi total (harga jual)</p>
           <p className="text-lg font-semibold text-slate-900">
             {formatRupiah(estimatedTotal)}
           </p>
