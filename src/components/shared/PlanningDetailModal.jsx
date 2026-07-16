@@ -1,36 +1,74 @@
-import { useState, useEffect } from "react"
-import { format } from "date-fns"
-import { ChevronDown, Trash2, Loader2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { useState, useEffect } from "react";
+import { format } from "date-fns";
+import { ChevronDown, Trash2, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
-  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogMedia,
-  AlertDialogTitle, AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
-import { getPlanningDetail, deletePlanning } from "@/services/planningService"
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import toast from "react-hot-toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogMedia,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { getPlanningDetail, deletePlanning } from "@/services/planningService";
 
-export default function PlanningDetailModal({ planningId, open, onOpenChange, recipes, inventories, onDeleted }) {
-  const [detail, setDetail] = useState(null)
-  const [loading, setLoading] = useState(false)
-  const [expandedId, setExpandedId] = useState(null)
-  const [confirmDelete, setConfirmDelete] = useState(false)
+// HAPUS props recipes dan inventories
+export default function PlanningDetailModal({
+  planningId,
+  open,
+  onOpenChange,
+  onDeleted,
+}) {
+  const [detail, setDetail] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [expandedId, setExpandedId] = useState(null);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   useEffect(() => {
-    if (!planningId) return
-    setLoading(true)
-    getPlanningDetail(planningId, { recipes, inventories })
+    if (!planningId) return;
+    setLoading(true);
+
+    // Panggil getPlanningDetail HANYA dengan planningId
+    getPlanningDetail(planningId)
       .then(setDetail)
       .catch((err) => console.error(err.message))
-      .finally(() => setLoading(false))
-  }, [planningId, recipes, inventories])
+      .finally(() => setLoading(false));
+
+    // Update dependency array (hapus recipes & inventories)
+  }, [planningId]);
 
   const handleDelete = async () => {
-    if (!planningId) return
-    await deletePlanning(planningId)
-    setConfirmDelete(false)
-    if (onDeleted) onDeleted()
-  }
+    if (!planningId) return;
+
+    try {
+      // Panggil fungsi delete dari planningService
+      await deletePlanning(planningId);
+
+      // Munculkan notifikasi sukses
+      toast.success("Simulasi berhasil dihapus");
+
+      // Tutup dialog konfirmasi
+      setConfirmDelete(false);
+
+      // Panggil fungsi onDeleted (untuk menutup modal utama & me-refresh daftar)
+      if (onDeleted) onDeleted();
+    } catch (err) {
+      // Munculkan notifikasi error dari backend
+      toast.error(err.message || "Gagal menghapus simulasi");
+      console.error("Gagal menghapus planning:", err);
+    }
+  };
 
   return (
     <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
@@ -54,32 +92,44 @@ export default function PlanningDetailModal({ planningId, open, onOpenChange, re
 
               <div className="space-y-2 pt-2">
                 {detail.materials.map((m) => {
-                  const isExpanded = expandedId === m.inventoryId
-                  const isShort = m.status === "KURANG"
+                  const isExpanded = expandedId === m.inventoryId;
+                  const isShort = m.status === "KURANG";
 
                   return (
                     <div
                       key={m.inventoryId}
                       className={`rounded-xl border overflow-hidden ${
-                        isShort ? "border-red-200 bg-red-50/40" : "border-emerald-200 bg-emerald-50/40"
+                        isShort
+                          ? "border-red-200 bg-red-50/40"
+                          : "border-emerald-200 bg-emerald-50/40"
                       }`}
                     >
                       <button
                         type="button"
-                        onClick={() => setExpandedId(isExpanded ? null : m.inventoryId)}
+                        onClick={() =>
+                          setExpandedId(isExpanded ? null : m.inventoryId)
+                        }
                         className="w-full flex items-center justify-between p-3 cursor-pointer"
                       >
                         <div className="text-left">
-                          <p className="font-medium text-slate-800">{m.ingredientName}</p>
-                          <p className={`text-xs ${isShort ? "text-red-500" : "text-emerald-600"}`}>
-                            Butuh {m.needed}{m.unit} — Tersedia {m.available}{m.unit}
+                          <p className="font-medium text-slate-800">
+                            {m.ingredientName}
+                          </p>
+                          <p
+                            className={`text-xs ${isShort ? "text-red-500" : "text-emerald-600"}`}
+                          >
+                            Butuh {m.needed}
+                            {m.unit} — Tersedia {m.available}
+                            {m.unit}
                             {isShort && ` (kurang ${m.shortage}${m.unit})`}
                           </p>
                         </div>
                         <div className="flex items-center gap-2">
                           <span
                             className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${
-                              isShort ? "bg-red-100 text-red-600" : "bg-emerald-100 text-emerald-600"
+                              isShort
+                                ? "bg-red-100 text-red-600"
+                                : "bg-emerald-100 text-emerald-600"
                             }`}
                           >
                             {m.status}
@@ -93,26 +143,34 @@ export default function PlanningDetailModal({ planningId, open, onOpenChange, re
                       {isExpanded && (
                         <div className="border-t border-slate-100 bg-white p-3 space-y-1.5">
                           {m.menus.map((menu, i) => (
-                            <div key={i} className="flex justify-between text-xs text-slate-500">
-                              <span>{menu.menuName} × {menu.menuQuantity}</span>
-                              <span>{menu.needed}{m.unit}</span>
+                            <div
+                              key={i}
+                              className="flex justify-between text-xs text-slate-500"
+                            >
+                              <span>
+                                {menu.menuName} × {menu.menuQuantity}
+                              </span>
+                              <span>
+                                {menu.needed}
+                                {m.unit}
+                              </span>
                             </div>
                           ))}
                         </div>
                       )}
                     </div>
-                  )
+                  );
                 })}
               </div>
 
               <div className="flex justify-between items-center pt-4 border-t border-slate-100">
-                <AlertDialogTrigger
-                  render={
-                    <Button variant="ghost" className="rounded-full cursor-pointer text-red-500 hover:bg-red-50">
-                      <Trash2 className="size-3.5 mr-1.5" /> Hapus Simulasi
-                    </Button>
-                  }
-                />
+                <Button
+                  variant="ghost"
+                  className="rounded-full cursor-pointer text-red-500 hover:bg-red-50"
+                  onClick={() => setConfirmDelete(true)} // <-- Gunakan onClick biasa
+                >
+                  <Trash2 className="size-3.5 mr-1.5" /> Hapus Simulasi
+                </Button>
                 <Button
                   variant="outline"
                   className="rounded-full cursor-pointer"
@@ -131,20 +189,31 @@ export default function PlanningDetailModal({ planningId, open, onOpenChange, re
           <AlertDialogMedia className="bg-red-50 text-red-500">
             <Trash2 />
           </AlertDialogMedia>
-          <AlertDialogTitle className="text-slate-900 font-bold">Hapus simulasi ini?</AlertDialogTitle>
+          <AlertDialogTitle className="text-slate-900 font-bold">
+            Hapus simulasi ini?
+          </AlertDialogTitle>
           <AlertDialogDescription className="text-slate-500">
             Riwayat simulasi ini akan dihapus permanen.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel variant="outline" className="rounded-full cursor-pointer">
+          <AlertDialogCancel
+            variant="outline"
+            className="rounded-full cursor-pointer"
+          >
             Batal
           </AlertDialogCancel>
-          <AlertDialogAction onClick={handleDelete} className="rounded-full cursor-pointer bg-red-500 hover:bg-red-600 text-white">
+          <AlertDialogAction
+            onClick={(e) => {
+              e.preventDefault(); // <-- Tahan agar dialog tidak menutup otomatis
+              handleDelete(); // <-- Baru jalankan fungsi hapus ke backend
+            }}
+            className="rounded-full cursor-pointer bg-red-500 hover:bg-red-600 text-white"
+          >
             Hapus
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  )
+  );
 }
