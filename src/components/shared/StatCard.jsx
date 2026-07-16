@@ -17,6 +17,7 @@ export default function StatCard({
   description,
   trend = "+12%",
   variant = "default",
+  icon: IconProp,
 }) {
   const styles = {
     default: {
@@ -50,14 +51,31 @@ export default function StatCard({
   ];
 
   const current = styles[variant];
-  const Icon = icons[label];
+  // Prioritaskan icon yang dikirim lewat prop. Kalau tidak ada,
+  // coba cocokkan dari mapping lama berdasarkan label.
+  // Fallback terakhir ke Package supaya tidak pernah undefined -> crash.
+  const Icon = IconProp || icons[label] || Package;
   const isRevenue = label === "Revenue";
+
+  // Ukuran font value menyesuaikan panjang teks, supaya angka besar
+  // ("Rp 1.018.555.405") atau nama panjang ("100 kopi") tidak meluber
+  // keluar kartu.
+  const valueText = String(value ?? "");
+  const valueSizeClass =
+    valueText.length <= 6
+      ? "text-5xl"
+      : valueText.length <= 10
+      ? "text-3xl"
+      : valueText.length <= 16
+      ? "text-2xl"
+      : "text-lg";
 
   if (isRevenue) {
     return (
       <div
         className="
           h-full
+          overflow-hidden
           rounded-2xl
           border
           border-border
@@ -150,6 +168,7 @@ export default function StatCard({
     <div
       className={`
         h-full
+        overflow-hidden
         rounded-2xl
         border
         ${current.border}
@@ -165,22 +184,24 @@ export default function StatCard({
 
         {/* Header */}
 
-        <div className="flex items-start justify-between">
+        <div className="flex items-start justify-between gap-3">
 
-          <div>
+          <div className="min-w-0">
 
             <p className="text-xs font-semibold uppercase tracking-[3px] text-muted-foreground">
               {label}
             </p>
 
-            <h2 className={`mt-4 text-5xl font-bold ${current.value}`}>
+            <h2
+              className={`mt-4 break-words ${valueSizeClass} font-bold leading-tight ${current.value}`}
+            >
               {value}
             </h2>
 
           </div>
 
           <div
-            className={`flex h-14 w-14 items-center justify-center rounded-2xl ${current.bg}`}
+            className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl ${current.bg}`}
           >
 
             <Icon
