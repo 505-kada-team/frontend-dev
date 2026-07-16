@@ -20,10 +20,6 @@ export const UNIT_OPTIONS = [
   },
   {
     value: "pcs",
-    label: "PCS",
-  },
-  {
-    value: "piece",
-    label: "Piece",
+    label: "Pcs",
   },
 ];

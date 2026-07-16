@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { format } from 'date-fns';
 import { Plus, Trash2, CalendarIcon, Loader2, ClipboardList } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -49,10 +50,9 @@ const planningSchema = z
   });
 
 export default function PlanningModal({ open, onOpenChange }) {
-  const { recipes, loading: loadingRecipes } = useRecipes();
+  const { recipes, loading: loadingRecipes } = useRecipes(open);
+  const { plannings, loading: loadingPlannings, refetch } = usePlannings(open);
   const { inventories } = useInventories();
-  const { plannings, loading: loadingPlannings, refetch } = usePlannings();
-
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [viewingId, setViewingId] = useState(null);
 
@@ -78,17 +78,25 @@ export default function PlanningModal({ open, onOpenChange }) {
 
   const onSubmit = async (data) => {
     setIsSubmitting(true);
+
     try {
       await createPlanning({
         name: data.name,
         startDate: data.startDate,
         endDate: data.endDate,
-        menus: data.menus.map((m) => ({ menuId: m.menuId, quantity: Number(m.quantity) })),
+        menus: data.menus.map((m) => ({
+          menuId: m.menuId,
+          quantity: Number(m.quantity),
+        })),
       });
+
+      toast.success("Planning berhasil dibuat");
+
       reset();
       refetch();
+      onOpenChange(false);
     } catch (err) {
-      console.error('Gagal membuat simulasi:', err.message);
+      toast.error(err.message || "Gagal membuat planning");
     } finally {
       setIsSubmitting(false);
     }
@@ -129,7 +137,19 @@ export default function PlanningModal({ open, onOpenChange }) {
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0">
-                          <Calendar mode="single" selected={field.value ? new Date(field.value) : undefined} onSelect={(date) => field.onChange(date?.toISOString())} />
+                          <Calendar
+                              mode="single"
+                              selected={
+                                field.value
+                                  ? new Date(field.value)
+                                  : undefined
+                              }
+                              onSelect={(date) =>
+                                field.onChange(
+                                  date ? format(date, "yyyy-MM-dd") : ""
+                                )
+                              }
+                            />
                         </PopoverContent>
                       </Popover>
                     )}
@@ -159,10 +179,15 @@ export default function PlanningModal({ open, onOpenChange }) {
                       ?.filter((_, i) => i !== index)
                       .map((m) => m.menuId)
                       .filter(Boolean);
-                    const availableRecipes = recipes.filter((r) => !usedElsewhere?.includes(String(r.id)));
+                    // Tambahkan (recipes || []) agar tidak error saat data masih kosong
+                    // Tambahkan (r.id || r._id) agar support MongoDB
+                    const availableRecipes = (recipes || []).filter(
+                      (r) => !usedElsewhere?.includes(String(r.id || r._id))
+                    );
+
                     const menuItems = availableRecipes.map((r) => ({
                       label: r.name,
-                      value: String(r.id),
+                      value: String(r.id || r._id), 
                     }));
 
                     return (
@@ -276,8 +301,7 @@ export default function PlanningModal({ open, onOpenChange }) {
         onOpenChange={(open) => {
           if (!open) setViewingId(null);
         }}
-        recipes={recipes}
-        inventories={inventories}
+        
         onDeleted={() => {
           setViewingId(null);
           refetch();

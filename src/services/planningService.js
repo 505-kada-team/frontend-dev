@@ -1,53 +1,53 @@
-// PLACEHOLDER — struktur data di sini sengaja dibuat SAMA PERSIS dengan
-// response backend asli (statusCode, _id, dsb) supaya nanti swap ke axios
-// call yang beneran tidak butuh ubah apa pun di hook/komponen pemanggilnya.
-import { calculateMaterials } from "@/lib/planningCalculations"
+import api from "../lib/api";
 
-let planningsStore = []
-let nextId = 1
-
-const delay = (ms = 300) => new Promise((res) => setTimeout(res, ms))
-
-export async function getPlannings() {
-  await delay()
-  return [...planningsStore].sort(
-    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-  )
-}
-
-export async function createPlanning({ name, startDate, endDate, menus }) {
-  await delay()
-  const newPlanning = {
-    _id: String(nextId++),
-    name,
-    startDate,
-    endDate,
-    menus, // disimpan mentah, dipakai buat kalkulasi saat detail dibuka
-    createdAt: new Date().toISOString(),
+// 1. Mengambil seluruh daftar planning
+export const getPlannings = async () => {
+  try {
+    const response = await api.get("/planning");
+    // Gunakan optional chaining agar aman jika datanya kosong
+    return response.data?.data || [];
+  } catch (error) {
+    console.error("Detail Error:", error);
+    throw new Error(error.response?.data?.message || "Gagal mengambil daftar planning");
   }
-  planningsStore.push(newPlanning)
-  return newPlanning
-}
+};
 
-export async function getPlanningDetail(id, { recipes, inventories }) {
-  await delay()
-  const planning = planningsStore.find((p) => p._id === id)
-  if (!planning) throw new Error("Planning tidak ditemukan")
+// 2. Membuat rencana produksi (Simulasi) baru
+export const createPlanning = async (data) => {
+  try {
+    const payload = {
+      name: data.name,
+      startDate: data.startDate,
+      endDate: data.endDate,
+      menus: data.menus,
+    };
 
-  const materials = calculateMaterials(planning.menus, recipes, inventories)
+    console.log("Payload Planning:", payload);
 
-  return {
-    planning: {
-      id: planning._id,
-      name: planning.name,
-      startDate: planning.startDate,
-      endDate: planning.endDate,
-    },
-    materials,
+    const response = await api.post("/planning", payload);
+    return response.data?.data;
+  } catch (error) {
+    console.error(error.response?.data);
+    throw new Error(error.response?.data?.message || "Gagal membuat planning");
   }
-}
+};
 
-export async function deletePlanning(id) {
-  await delay()
-  planningsStore = planningsStore.filter((p) => p._id !== id)
-}
+// 3. Mengambil detail kalkulasi satu planning
+export const getPlanningDetail = async (id) => {
+  try {
+    const response = await api.get(`/planning/${id}`);
+    return response.data?.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Gagal mengambil detail planning");
+  }
+};
+
+// 4. Menghapus planning
+export const deletePlanning = async (id) => {
+  try {
+    const response = await api.delete(`/planning/${id}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Gagal menghapus planning");
+  }
+};
