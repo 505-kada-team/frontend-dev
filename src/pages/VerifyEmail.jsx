@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { Mail, ArrowLeft } from "lucide-react";
 
@@ -26,10 +26,24 @@ export default function VerifyEmailPage() {
   const [otp, setOtp] = useState("");
 
   const { handleConfirmOtp, handleResendOtp, loading } = useVerifyEmail();
+  const [countdown, setCountdown] = useState(60);
+
+  useEffect(() => {
+    // Jika countdown sudah 0, hentikan timer
+    if (countdown <= 0) return;
+
+    // Kurangi 1 setiap 1000ms (1 detik)
+    const timer = setInterval(() => {
+      setCountdown((prev) => prev - 1);
+    }, 1000);
+
+    // Cleanup interval saat komponen di-unmount atau countdown berubah
+    return () => clearInterval(timer);
+  }, [countdown]);
 
   const onVerifySubmit = async (e) => {
     e.preventDefault();
-    
+
     if (otp.length < 6) {
       toast.error("Please enter a valid 6-digit code");
       return;
@@ -52,7 +66,6 @@ export default function VerifyEmailPage() {
 
         <CardContent>
           <form onSubmit={onVerifySubmit} className="space-y-6">
-            
             {/* Input Email */}
             <div className="space-y-1.5">
               <Label htmlFor="email" className="text-slate-700">
@@ -94,17 +107,25 @@ export default function VerifyEmailPage() {
               {loading ? "Verifying..." : "Verify Email"}
             </Button>
           </form>
-          
+
           {/* Tombol Resend */}
-          <div className="text-center mt-4">
-            <button
-              type="button"
-              onClick={() => handleResendOtp(email)}
-              disabled={loading}
-              className="text-sm font-medium text-orange-500 hover:text-orange-600 hover:underline transition-colors disabled:opacity-50 cursor-pointer"
+          <div className="mt-4 text-center">
+            <p className="text-sm text-gray-600 mb-2">Belum menerima kode?</p>
+
+            <Button
+              variant="link" // Atau variant "outline" sesuai desainmu
+              disabled={loading || countdown > 0} // Tombol mati kalau countdown masih jalan
+              onClick={async () => {
+                await handleResendOtp(email);
+                setCountdown(60);
+                toast.success("Verification code sent.");
+              }}
+              className="text-orange-500 hover:text-orange-600 p-0 h-auto font-medium"
             >
-              Resend code
-            </button>
+              {countdown > 0
+                ? `Kirim ulang dalam ${countdown} detik`
+                : "Kirim Ulang Kode"}
+            </Button>
           </div>
         </CardContent>
 

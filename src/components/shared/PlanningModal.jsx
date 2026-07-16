@@ -78,17 +78,25 @@ export default function PlanningModal({ open, onOpenChange }) {
 
   const onSubmit = async (data) => {
     setIsSubmitting(true);
+
     try {
       await createPlanning({
         name: data.name,
         startDate: data.startDate,
         endDate: data.endDate,
-        menus: data.menus.map((m) => ({ menuId: m.menuId, quantity: Number(m.quantity) })),
+        menus: data.menus.map((m) => ({
+          menuId: m.menuId,
+          quantity: Number(m.quantity),
+        })),
       });
+
+      toast.success("Planning berhasil dibuat");
+
       reset();
       refetch();
+      onOpenChange(false);
     } catch (err) {
-      console.error('Gagal membuat simulasi:', err.message);
+      toast.error(err.message || "Gagal membuat planning");
     } finally {
       setIsSubmitting(false);
     }
@@ -129,7 +137,19 @@ export default function PlanningModal({ open, onOpenChange }) {
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0">
-                          <Calendar mode="single" selected={field.value ? new Date(field.value) : undefined} onSelect={(date) => field.onChange(date?.toISOString())} />
+                          <Calendar
+                              mode="single"
+                              selected={
+                                field.value
+                                  ? new Date(field.value)
+                                  : undefined
+                              }
+                              onSelect={(date) =>
+                                field.onChange(
+                                  date ? format(date, "yyyy-MM-dd") : ""
+                                )
+                              }
+                            />
                         </PopoverContent>
                       </Popover>
                     )}
