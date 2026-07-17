@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://backend-dev-ap4n.onrender.com/api/v1/",
+  baseURL: import.meta.env.VITE_API_URL,
   withCredentials: true, //browser mengizinkan pengiriman dan penerimaan cookie secara otomatis untuk refresh token.
 });
 
