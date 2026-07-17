@@ -9,7 +9,7 @@ const navItems = [
   { to: "/dashboard", label: "Dashboard" },
   { to: "/inventories", label: "Inventory" },
   { to: "/recipes", label: "Recipes" },
-  { to: "/selling-plan", label: "Selling Plan" },
+  { to: "/selling-plan", label: "Selling" },
   { to: "/settings", label: "Settings" },
 ];
 

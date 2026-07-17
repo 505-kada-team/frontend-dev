@@ -36,7 +36,7 @@ const navItems = [
   },
   {
     to: "/selling-plan",
-    label: "Selling Plan",
+    label: "Selling",
     icon: TrendingUp,
   },
   {

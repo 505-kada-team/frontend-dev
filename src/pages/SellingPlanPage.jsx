@@ -11,7 +11,7 @@ export default function SellingPlanPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Selling Plan</h1>
+        <h1 className="text-2xl font-bold text-slate-900">Selling</h1>
         <p className="text-sm text-slate-600">
           Catat transaksi penjualan dan lihat riwayatnya
         </p>
