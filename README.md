@@ -1,14 +1,4 @@
 <!--
-  CARA PAKAI TEMPLATE INI:
-  Setiap bagian punya komentar HTML kayak gini yang menjelaskan apa yang
-  perlu diisi dan format Markdown yang cocok. Komentar <!-- --> TIDAK akan
-  muncul saat file ini di-render di GitHub — aman ditinggal sebagai catatan
-  buat diri sendiri, atau dihapus semua kalau sudah selesai isi.
--->
-
-<!--
-  BADGES (opsional tapi bikin README lebih profesional).
-  Generate otomatis di https://shields.io — pilih tech stack kamu.
   Format: ![Label](URL_gambar)
 -->
 ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)
